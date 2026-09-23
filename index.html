@@ -451,8 +451,9 @@
       <div class="player-card">
         <h3 style="color: #db2777; margin-bottom: 10px;">MUSIC PLAYER</h3>
         <img class="album-art" id="album-art" src="anh5.jpg" alt="Music">
-        <div class="song-title" id="song-title">A Thousand Years</div>
-        <div class="song-artist" id="song-artist">Christina Perri</div>
+        <div class="song-title" id="song-title">Âm Nhạc</div>
+        <div class="song-artist" id="song-artist">Ấn bài tiếp theo để nghe. Nhớ là có 3 bài nha cô gái</div>
+        <div class="song-artist" id="song-artist"> Nhớ là có 3 bài nha cô gái</div>
         <div class="controls">
           <button class="ctrl-btn" onclick="prevSong()"><i class="fa-solid fa-backward-step"></i></button>
           <button class="ctrl-btn play" onclick="togglePlay()"><i class="fa-solid fa-circle-play" id="play-icon"></i></button>
@@ -598,46 +599,67 @@
       document.getElementById('lightbox').style.display = 'flex';
     }
 
-    // ----------------------------------------------------
-    // 4. MUSIC PLAYER LOGIC
+   // ----------------------------------------------------
+    // 4. MUSIC PLAYER LOGIC (SỬ DỤNG FILE NHẠC THẬT)
     // ----------------------------------------------------
     const playlist = [
-      { title: "A Thousand Years", artist: "Christina Perri", cover: "anh5.jpg" },
-      { title: "Sugar", artist: "Maroon 5", cover: "anh7.jpg" },
-      { title: "At My Worst", artist: "Pink Sweat$", cover: "anh8.jpg" }
+      { 
+        title: "CÔ GÁI NÀY LÀ CỦA AI", 
+        artist: "Krix X Rush ft. Nhi Nhi", 
+        cover: "anh7.jpg",
+        src: "amnhac1.mp3" // Đường dẫn tới file nhạc mp3 của bạn
+      },
+      { 
+        title: "Tệ Hại Và Xấu Xí", 
+        artist: "B Ray",
+        cover: "anh8.jpg",
+        src: "amnhac2.mp3" // Bạn có thể thêm file music2.mp3 nếu muốn đổi bài
+      },
+      { 
+        title: "Hoàn Hảo", 
+        artist: "B Ray", 
+        cover: "anh5.jpg",
+        src: "amnhac3.mp3"
+      }
     ];
+
     let currentSongIndex = 0;
     let isPlaying = false;
-    let audioCtx = null;
+    
+    // Tạo đối tượng Audio của HTML5
+    const audioPlayer = new Audio(playlist[0].src);
 
     function updateSongUI() {
       const song = playlist[currentSongIndex];
       document.getElementById('song-title').innerText = song.title;
       document.getElementById('song-artist').innerText = song.artist;
       document.getElementById('album-art').src = song.cover;
+      
+      // Đổi nguồn nhạc khi chuyển bài
+      audioPlayer.src = song.src;
+      if (isPlaying) {
+        audioPlayer.play();
+      }
     }
 
     function togglePlay() {
-      isPlaying = !isPlaying;
       const playIcon = document.getElementById('play-icon');
       const albumArt = document.getElementById('album-art');
 
       if (isPlaying) {
-        playIcon.className = 'fa-solid fa-circle-pause';
-        albumArt.classList.add('playing');
-        playRomanticMelody();
-      } else {
+        audioPlayer.pause();
+        isPlaying = false;
         playIcon.className = 'fa-solid fa-circle-play';
         albumArt.classList.remove('playing');
-        if (audioCtx) audioCtx.suspend();
+      } else {
+        audioPlayer.play().then(() => {
+          isPlaying = true;
+          playIcon.className = 'fa-solid fa-circle-pause';
+          albumArt.classList.add('playing');
+        }).catch(err => {
+          alert("Không thể phát nhạc. Bạn hãy kiểm tra file music.mp3 đã để cùng thư mục chưa nhé!");
+        });
       }
-    }
-
-    function playRomanticMelody() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      audioCtx.resume();
     }
 
     function nextSong() {
@@ -650,6 +672,10 @@
       updateSongUI();
     }
 
+    // Tự động chuyển bài khi hết nhạc
+    audioPlayer.addEventListener('ended', function() {
+      nextSong();
+    });
     // ----------------------------------------------------
     // 5. GIFT ANIMATION (CANVAS BLOOMING FLOWERS)
     // ----------------------------------------------------
